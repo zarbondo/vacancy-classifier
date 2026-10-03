@@ -1,0 +1,8 @@
+/data/
+results/model.pt
+results/model.onnx
+results_smoke/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/

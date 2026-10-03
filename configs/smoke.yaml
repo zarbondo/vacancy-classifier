@@ -1,0 +1,38 @@
+# быстрый прогон всего пайплайна на синтетике и крошечной модели,
+# чтобы проверить, что код живой, без скачивания rubert и похода на hh.ru
+seed: 42
+
+data:
+  synthetic: {n: 3000}
+  min_text_len: 10
+  min_class_count: 30
+  test_size: 0.2
+  val_size: 0.1
+
+model:
+  name: __tiny__          # собрать случайный мини-BERT локально
+  max_len: 64
+  dropout: 0.1
+  tiny: {vocab_size: 3000, hidden_size: 64, num_hidden_layers: 2, num_attention_heads: 2, intermediate_size: 128}
+
+train:
+  epochs: 2
+  batch_size: 32
+  lr: 1.0e-3
+  head_lr: 1.0e-3
+  warmup_ratio: 0.1
+  weight_decay: 0.01
+  grade_weight: 1.0
+  role_weight: 1.0
+  class_balance: true
+
+cluster:
+  sample: 1000
+  umap: {n_neighbors: 10, min_dist: 0.0, n_components: 5}
+  hdbscan: {min_cluster_size: 15, min_samples: 5}
+
+export:
+  onnx_path: results_smoke/model.onnx
+  bench_runs: 20
+
+results_dir: results_smoke

@@ -1,0 +1,47 @@
+seed: 42
+
+collect:
+  # роли с hh.ru: 96 программист, 165 дата-сайентист, 164 дата-аналитик,
+  # 160 devops, 104 системный аналитик, 10 аналитик, 124 тестировщик,
+  # 107 руководитель проектов, 36 менеджер продукта, 157 техлид
+  roles: [96, 165, 164, 160, 104, 10, 124, 107, 36, 157]
+  area: 113          # Россия
+  per_page: 100
+  max_pages: 20      # hh отдаёт максимум 2000 вакансий на запрос
+  period: 30         # за сколько дней собирать
+  pause: 0.3         # пауза между запросами, чтобы не словить 429
+  out: data/vacancies.parquet
+
+data:
+  path: data/vacancies.parquet
+  min_text_len: 40       # вакансии короче — мусор
+  min_class_count: 150   # роли, где меньше вакансий, уходят в "прочее"
+  test_size: 0.2
+  val_size: 0.1
+
+model:
+  name: cointegrated/rubert-tiny2
+  max_len: 256
+  dropout: 0.2
+
+train:
+  epochs: 4
+  batch_size: 32
+  lr: 3.0e-5
+  head_lr: 1.0e-3        # головам нужен шаг побольше, чем энкодеру
+  warmup_ratio: 0.1
+  weight_decay: 0.01
+  grade_weight: 1.0      # вес лосса головы грейда
+  role_weight: 1.0
+  class_balance: true    # веса классов в лоссе: грейды сильно несбалансированы
+
+cluster:
+  sample: 20000
+  umap: {n_neighbors: 15, min_dist: 0.0, n_components: 10}
+  hdbscan: {min_cluster_size: 60, min_samples: 10}
+
+export:
+  onnx_path: results/model.onnx
+  bench_runs: 200
+
+results_dir: results
